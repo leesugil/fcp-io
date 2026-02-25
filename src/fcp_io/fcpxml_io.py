@@ -2,6 +2,21 @@ import xml.etree.ElementTree as ET
 import os
 import shutil
 
+def clean_filepath(line):
+    output = os.path.abspath(line.strip())
+    return output
+
+def parse_fcpxml_filepath(xf):
+    fcpxml_filename = 'Info.fcpxml'
+    fcpxml_filepath = os.path.join(xf, fcpxml_filename)
+    tree = ET.parse(fcpxml_filepath)
+    root = tree.getroot()
+    media_rep = root.find(".//media-rep[@kind='original-media']")
+    output = media_rep.get('src')
+    output = urlparse(output)
+    output = unquote(output.path)
+    return output
+
 def get_fcpxml(filepath):
     """
     returns tree, root (XML)
@@ -22,6 +37,18 @@ def get_resources(root):
     parent = root
     return parent.find('resources')
 
+def get_library(root):
+    parent = root
+    return parent.find('library')
+
+def get_event(root):
+    parent = get_library
+    return parent.find('event')
+
+def get_event_asset_clip(root):
+    parent = get_event(root)
+    return parent.find('asset-clip')
+
 def get_format(root):
     parent = get_resources(root)
     return parent.find('format')
@@ -36,7 +63,6 @@ def get_spine(root):
     """
     return root.find(".//spine")
 
-#def get_asset_clip(root):
 def get_last_asset_clip(spine):
     """
     Assumption: root contains only one asset and only one asset-clip in the spine of the Project Timeline.
@@ -45,7 +71,6 @@ def get_last_asset_clip(spine):
     clips = spine.findall('asset-clip')
     return clips[-1]
 
-#def save(tree, src_filepath, affix=''):
 def save_with_affix(tree, src_filepath, affix=''):
     """
     Stores the worked fcpxml in the same folder as the source filepath with the affix attached to the new file name.
