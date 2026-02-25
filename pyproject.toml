@@ -1,0 +1,21 @@
+[project]
+name = "fcp-io"
+version = "0.0.1"
+authors = [
+  { name="Sugil Steve Lee", email="sugilmath@gmail.com" },
+]
+description = "Read, edit, and save FCPXML data using this package."
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "GPL-3.0-or-later"
+license-files = ["LICEN[CS]E*"]
+
+[project.urls]
+Homepage = "https://github.com/leesugil/fcp-io"
+Issues = "https://github.com/leesugil/fcp-io/issues"
+
+[project.scripts]
