@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as ET
+from urllib.parse import urlparse, unquote
 import os
 import shutil
 
@@ -42,7 +43,7 @@ def get_library(root):
     return parent.find('library')
 
 def get_event(root):
-    parent = get_library
+    parent = get_library(root)
     return parent.find('event')
 
 def get_event_asset_clip(root):
@@ -62,6 +63,10 @@ def get_spine(root):
     Returns the spine element of xml.
     """
     return root.find(".//spine")
+
+def get_spine_asset_clip(root):
+    parent = get_spine(root)
+    return parent.find('asset-clip')
 
 def get_last_asset_clip(spine):
     """
