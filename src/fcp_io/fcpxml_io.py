@@ -61,8 +61,12 @@ def get_fps(root):
 def get_spine(root):
     """
     Returns the spine element of xml.
+
+    <spine> can appear multiple times.
+    The spine that I originally intended for this function was the Project Timeline spine.
     """
-    return root.find(".//spine")
+    output = root.find('library').find('event').find('project').find('sequence').find('spine')
+    return output
 
 def get_spine_asset_clip(root):
     parent = get_spine(root)
