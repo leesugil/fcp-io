@@ -12,7 +12,7 @@ def parse_fcpxml_filepath(xf):
     fcpxml_filepath = os.path.join(xf, fcpxml_filename)
     tree = ET.parse(fcpxml_filepath)
     root = tree.getroot()
-    media_rep = root.find(".//media-rep[@kind='original-media']")
+    media_rep = root.find(".//media-rep[@kind='original-media']") # This should be legacy, potentially would not work well with multiple media sources.
     output = media_rep.get('src')
     output = urlparse(output)
     output = unquote(output.path)
@@ -58,6 +58,13 @@ def get_fps(root):
     parent = get_format(root)
     return parent.get('frameDuration')
 
+def get_sequence(root):
+    """
+    Returns the main project sequence element of xml.
+    """
+    output = root.find('library').find('event').find('project').find('sequence')
+    return output
+
 def get_spine(root):
     """
     Returns the spine element of xml.
@@ -65,12 +72,16 @@ def get_spine(root):
     <spine> can appear multiple times.
     The spine that I originally intended for this function was the Project Timeline spine.
     """
-    output = root.find('library').find('event').find('project').find('sequence').find('spine')
+    output = get_sequence(root).find('spine')
     return output
 
 def get_spine_asset_clip(root):
     parent = get_spine(root)
     return parent.find('asset-clip')
+
+def get_all_spine_asset_clips(root):
+    spine = get_spine(root)
+    return spine.findall('asset-clip')
 
 def get_last_asset_clip(spine):
     """
@@ -98,3 +109,20 @@ def save_with_affix(tree, src_filepath, affix=''):
     ET.indent(tree, space="\t", level=0)
     tree.write(destination_filepath, encoding='UTF-8', xml_declaration=True)
 
+def parse_resource_filepath_from_asset_clip(asset_clip, root, debug=False):
+    reference_code = asset_clip.get('ref')
+    resources = root.find('resources')
+    if debug:
+        print(f"parse_resource_filepath_from_asset_clip reference_code: {reference_code}")
+    for r in resources:
+        if debug:
+            print(f"parse_resource_filepath_from_asset_clip resource element to scan: {r.tag}, id: {r.get('id')}")
+        if (r.tag == 'asset') and (r.get('id') == reference_code):
+            if debug:
+                print("🐝 detected!")
+            media_rep = r.find("media-rep[@kind='original-media']")
+            output = media_rep.get('src')
+            output = urlparse(output)
+            output = unquote(output.path)
+            return output
+    return None
