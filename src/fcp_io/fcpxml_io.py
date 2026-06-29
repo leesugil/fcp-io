@@ -80,8 +80,12 @@ def get_spine_asset_clip(root):
     return parent.find('asset-clip')
 
 def get_all_spine_asset_clips(root):
+    parent = get_spine(root)
+    return parent.findall('asset-clip')
+
+def get_primary_story_elements(root):
     spine = get_spine(root)
-    return spine.findall('asset-clip')
+    return list(spine)
 
 def get_last_asset_clip(spine):
     """
